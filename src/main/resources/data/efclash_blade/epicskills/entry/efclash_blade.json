@@ -1,0 +1,13 @@
+{
+	"nodes": [
+		{
+			"ability_points": 0,
+			"hidden": false,
+			"position_in_screen": [
+				20,
+				30
+			],
+			"skill": "efclash_blade:clash_blade"
+		}
+	]
+}

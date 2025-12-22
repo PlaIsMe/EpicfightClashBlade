@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -55,6 +56,44 @@ public class MobClashBladeEvent {
         return false;
     }
 
+    private static void clashBlade(LivingAttackEvent livingAttackEvent, LivingEntityPatch<?> defenderLivingEntityPatch,
+                                   Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel) {
+        customPreAdditionClashBlade();
+        livingAttackEvent.setCanceled(true);
+        defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
+
+        attackerEntity.setDeltaMovement(new Vec3(
+                attackerEntity.getLookAngle().x * -0.2D,
+                0.0D,
+                attackerEntity.getLookAngle().z * -0.2D
+        ));
+
+        defenderEntity.setDeltaMovement(new Vec3(
+                defenderEntity.getLookAngle().x * -0.2D,
+                0.0D,
+                defenderEntity.getLookAngle().z * -0.2D
+        ));
+
+        EpicFightParticles.HIT_BLUNT.get().spawnParticleWithArgument(
+                serverLevel,
+                HitParticleType.FRONT_OF_EYES,
+                HitParticleType.ZERO,
+                defenderEntity,
+                attackerEntity
+        );
+        customPostAdditionClashBlade();
+    }
+
+    private static boolean customAdditionClashBladeLogic() {
+        return false;
+    }
+
+    private static void customPreAdditionClashBlade() {
+    }
+
+    private static void customPostAdditionClashBlade() {
+    }
+
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent livingAttackEvent) {
         Entity defenderEntity = livingAttackEvent.getEntity();
@@ -98,28 +137,9 @@ public class MobClashBladeEvent {
         if (entitySubtract.dot(entityViewVector) > 0.0D
                 && defenderDynamicAnimation.get() instanceof AttackAnimation
                 && defenderEntityState.getLevel() < 3) {
-            livingAttackEvent.setCanceled(true);
-            defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
-
-            attackerEntity.setDeltaMovement(new Vec3(
-                    attackerEntity.getLookAngle().x * -0.2D,
-                    0.0D,
-                    attackerEntity.getLookAngle().z * -0.2D
-            ));
-
-            defenderEntity.setDeltaMovement(new Vec3(
-                    defenderEntity.getLookAngle().x * -0.2D,
-                    0.0D,
-                    defenderEntity.getLookAngle().z * -0.2D
-            ));
-
-            EpicFightParticles.HIT_BLUNT.get().spawnParticleWithArgument(
-                    serverLevel,
-                    HitParticleType.FRONT_OF_EYES,
-                    HitParticleType.ZERO,
-                    defenderEntity,
-                    attackerEntity
-            );
+            clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
+        } else if (customAdditionClashBladeLogic()) {
+            clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
         }
     }
 }

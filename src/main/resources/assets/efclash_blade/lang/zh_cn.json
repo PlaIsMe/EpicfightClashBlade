@@ -1,4 +1,5 @@
 {
   "skill.efclash_blade.clash_blade": "冲击之刃",
-  "skill.efclash_blade.clash_blade.tooltip": "在挥击过程中格挡即将到来的近战攻击和投射物，取消伤害并将目标击退。"
+  "skill.efclash_blade.clash_blade.tooltip": "在挥击过程中格挡即将到来的近战攻击和投射物，取消伤害并将目标击退。",
+  "skill_tree.efclash_blade.efclash_blade": "冲击之刃"
 }
