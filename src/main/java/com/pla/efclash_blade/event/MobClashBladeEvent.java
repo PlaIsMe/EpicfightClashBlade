@@ -1,6 +1,5 @@
 package com.pla.efclash_blade.event;
 
-import com.pla.efclash_blade.EFClashBlade;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -8,7 +7,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -57,8 +55,9 @@ public class MobClashBladeEvent {
     }
 
     private static void clashBlade(LivingAttackEvent livingAttackEvent, LivingEntityPatch<?> defenderLivingEntityPatch,
-                                   Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel) {
-        customPreAdditionClashBlade();
+                                   AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                   EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel) {
+        customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity);
         livingAttackEvent.setCanceled(true);
         defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
 
@@ -81,19 +80,33 @@ public class MobClashBladeEvent {
                 defenderEntity,
                 attackerEntity
         );
-        customPostAdditionClashBlade();
+        customPostAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity);
     }
 
     private static boolean customAdditionClashBladeLogic(LivingAttackEvent livingAttackEvent,
+                                                         LivingEntityPatch<?> defenderLivingEntityPatch,
                                                          AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
-                                                         EntityState defenderEntityState) {
+                                                         EntityState defenderEntityState, Entity attacker, Entity defender) {
         return false;
     }
 
-    private static void customPreAdditionClashBlade() {
+    private static boolean blacklistClashBladeAnimation(LivingAttackEvent livingAttackEvent,
+                                                         LivingEntityPatch<?> defenderLivingEntityPatch,
+                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         EntityState defenderEntityState, Entity attacker, Entity defender) {
+        return true;
     }
 
-    private static void customPostAdditionClashBlade() {
+    private static void customPreAdditionClashBlade(LivingAttackEvent livingAttackEvent,
+                                                    LivingEntityPatch<?> defenderLivingEntityPatch,
+                                                    AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                    EntityState defenderEntityState, Entity attacker, Entity defender) {
+    }
+
+    private static void customPostAdditionClashBlade(LivingAttackEvent livingAttackEvent,
+                                                     LivingEntityPatch<?> defenderLivingEntityPatch,
+                                                     AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                     EntityState defenderEntityState, Entity attacker, Entity defender) {
     }
 
     @SubscribeEvent
@@ -138,8 +151,10 @@ public class MobClashBladeEvent {
 
         if (entitySubtract.dot(entityViewVector) > 0.0D) {
             if ((defenderDynamicAnimation.get() instanceof AttackAnimation
-                    && defenderEntityState.getLevel() < 3) || customAdditionClashBladeLogic(livingAttackEvent, defenderDynamicAnimation, defenderEntityState)) {
-                clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
+                    && defenderEntityState.getLevel() < 3
+                    && blacklistClashBladeAnimation(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity))
+                    || customAdditionClashBladeLogic(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
+                clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel);
             }
         }
     }
