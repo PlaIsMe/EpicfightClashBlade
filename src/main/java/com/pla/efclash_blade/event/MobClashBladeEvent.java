@@ -84,7 +84,9 @@ public class MobClashBladeEvent {
         customPostAdditionClashBlade();
     }
 
-    private static boolean customAdditionClashBladeLogic() {
+    private static boolean customAdditionClashBladeLogic(LivingAttackEvent livingAttackEvent,
+                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         EntityState defenderEntityState) {
         return false;
     }
 
@@ -134,12 +136,11 @@ public class MobClashBladeEvent {
         Vec3 entityViewVector = defenderEntity.getViewVector(1.0F);
         Vec3 entitySubtract = entityPosition.subtract(defenderEntity.getEyePosition()).normalize();
 
-        if (entitySubtract.dot(entityViewVector) > 0.0D
-                && defenderDynamicAnimation.get() instanceof AttackAnimation
-                && defenderEntityState.getLevel() < 3) {
-            clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
-        } else if (customAdditionClashBladeLogic()) {
-            clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
+        if (entitySubtract.dot(entityViewVector) > 0.0D) {
+            if ((defenderDynamicAnimation.get() instanceof AttackAnimation
+                    && defenderEntityState.getLevel() < 3) || customAdditionClashBladeLogic(livingAttackEvent, defenderDynamicAnimation, defenderEntityState)) {
+                clashBlade(livingAttackEvent, defenderLivingEntityPatch, attackerEntity, defenderEntity, serverLevel);
+            }
         }
     }
 }
