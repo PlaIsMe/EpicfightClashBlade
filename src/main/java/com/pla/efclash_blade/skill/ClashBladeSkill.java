@@ -7,6 +7,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.AttackAnimation;
 import yesman.epicfight.api.animation.types.DynamicAnimation;
@@ -19,6 +20,7 @@ import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.passive.PassiveSkill;
+import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem.WeaponCategories;
 import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
@@ -31,6 +33,11 @@ public class ClashBladeSkill extends PassiveSkill {
 
     public ClashBladeSkill(SkillBuilder<? extends PassiveSkill> skillBuilder) {
         super(skillBuilder);
+    }
+
+    private static boolean blacklistClashBladeAnimation(AssetAccessor<? extends DynamicAnimation> dynamicAnimation,
+                                                        EntityState entityState, ServerPlayer serverPlayer) {
+        return true;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class ClashBladeSkill extends PassiveSkill {
                     && !damageSource.is(DamageTypes.MAGIC) && !damageSource.is(DamageTypes.EXPLOSION)
                     && !damageSource.is(DamageTypes.ON_FIRE) && !damageSource.is(DamageTypes.IN_FIRE)
                     && !damageSource.is(DamageTypes.FALL) && dynamicAnimation.get() instanceof AttackAnimation
-                    && entityState.getLevel() < 3) {
+                    && entityState.getLevel() < 3 && blacklistClashBladeAnimation(dynamicAnimation, entityState, serverPlayer)) {
                 Entity entity = damageSource.getEntity();
 
                 if (entity != null) {
