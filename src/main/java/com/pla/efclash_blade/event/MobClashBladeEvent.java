@@ -59,7 +59,9 @@ public class MobClashBladeEvent {
                                    EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel) {
         customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity);
         livingAttackEvent.setCanceled(true);
-        defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
+        if (conditionToPlayClashSound(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
+            defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
+        }
 
         attackerEntity.setDeltaMovement(new Vec3(
                 attackerEntity.getLookAngle().x * -0.2D,
@@ -107,6 +109,13 @@ public class MobClashBladeEvent {
                                                      LivingEntityPatch<?> defenderLivingEntityPatch,
                                                      AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
                                                      EntityState defenderEntityState, Entity attacker, Entity defender) {
+    }
+
+    private static boolean conditionToPlayClashSound(LivingAttackEvent livingAttackEvent,
+                                                     LivingEntityPatch<?> defenderLivingEntityPatch,
+                                                     AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                     EntityState defenderEntityState, Entity attacker, Entity defender) {
+        return true;
     }
 
     @SubscribeEvent
