@@ -1,5 +1,6 @@
 package com.pla.efclash_blade.event;
 
+import com.pla.efclash_blade.EFClashBlade;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -28,6 +29,7 @@ import yesman.epicfight.world.capabilities.item.CapabilityItem.WeaponCategories;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @EventBusSubscriber
 public class MobClashBladeEvent {
@@ -133,14 +135,7 @@ public class MobClashBladeEvent {
         }
 
         LivingEntityPatch<?> defenderLivingEntityPatch = EpicFightCapabilities.getEntityPatch(defenderEntity, LivingEntityPatch.class);
-
-        if (defenderLivingEntityPatch == null
-                || defenderLivingEntityPatch.getHoldingItemCapability(InteractionHand.MAIN_HAND).getWeaponCategory() == WeaponCategories.FIST
-                || damageSource.is(DamageTypes.MAGIC)
-                || damageSource.is(DamageTypes.EXPLOSION)
-                || damageSource.is(DamageTypes.ON_FIRE)
-                || damageSource.is(DamageTypes.IN_FIRE)
-                || damageSource.is(DamageTypes.FALL)) {
+        if (defenderLivingEntityPatch == null) {
             return;
         }
 
@@ -161,7 +156,13 @@ public class MobClashBladeEvent {
         if (entitySubtract.dot(entityViewVector) > 0.0D) {
             if ((defenderDynamicAnimation.get() instanceof AttackAnimation
                     && defenderEntityState.getLevel() < 3
-                    && blacklistClashBladeAnimation(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity))
+                    && blacklistClashBladeAnimation(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)
+                    && defenderLivingEntityPatch.getHoldingItemCapability(InteractionHand.MAIN_HAND).getWeaponCategory() != WeaponCategories.FIST
+                    && !damageSource.is(DamageTypes.MAGIC)
+                    && !damageSource.is(DamageTypes.EXPLOSION)
+                    && !damageSource.is(DamageTypes.ON_FIRE)
+                    && !damageSource.is(DamageTypes.IN_FIRE)
+                    && !damageSource.is(DamageTypes.FALL))
                     || customAdditionClashBladeLogic(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
                 clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel);
             }
