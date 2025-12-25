@@ -56,10 +56,14 @@ public class MobClashBladeEvent {
         return false;
     }
 
+    // clashBy value
+    // 0: regular clash, clashing in front of mob while swinging attack animation
+    // 1: special clash, clashing in front of mob without swinging attack animation, can clash against any type of damageSource
+    // 3: force clash,clash without in front of mob, against any type of damage source
     private static void clashBlade(LivingAttackEvent livingAttackEvent, LivingEntityPatch<?> defenderLivingEntityPatch,
                                    AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
-                                   EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel) {
-        customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity);
+                                   EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel, int clashBy) {
+        customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, clashBy);
         livingAttackEvent.setCanceled(true);
         if (conditionToPlayClashSound(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
             defenderLivingEntityPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
@@ -84,10 +88,17 @@ public class MobClashBladeEvent {
                 defenderEntity,
                 attackerEntity
         );
-        customPostAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity);
+        customPostAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, clashBy);
     }
 
     private static boolean customAdditionClashBladeLogic(LivingAttackEvent livingAttackEvent,
+                                                         LivingEntityPatch<?> defenderLivingEntityPatch,
+                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         EntityState defenderEntityState, Entity attacker, Entity defender) {
+        return false;
+    }
+
+    private static boolean forceClashBlade(LivingAttackEvent livingAttackEvent,
                                                          LivingEntityPatch<?> defenderLivingEntityPatch,
                                                          AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
                                                          EntityState defenderEntityState, Entity attacker, Entity defender) {
@@ -104,13 +115,13 @@ public class MobClashBladeEvent {
     private static void customPreAdditionClashBlade(LivingAttackEvent livingAttackEvent,
                                                     LivingEntityPatch<?> defenderLivingEntityPatch,
                                                     AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
-                                                    EntityState defenderEntityState, Entity attacker, Entity defender) {
+                                                    EntityState defenderEntityState, Entity attacker, Entity defender, int clashBy) {
     }
 
     private static void customPostAdditionClashBlade(LivingAttackEvent livingAttackEvent,
                                                      LivingEntityPatch<?> defenderLivingEntityPatch,
                                                      AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
-                                                     EntityState defenderEntityState, Entity attacker, Entity defender) {
+                                                     EntityState defenderEntityState, Entity attacker, Entity defender, int clashBy) {
     }
 
     private static boolean conditionToPlayClashSound(LivingAttackEvent livingAttackEvent,
@@ -154,7 +165,7 @@ public class MobClashBladeEvent {
         Vec3 entitySubtract = entityPosition.subtract(defenderEntity.getEyePosition()).normalize();
 
         if (entitySubtract.dot(entityViewVector) > 0.0D) {
-            if ((defenderDynamicAnimation.get() instanceof AttackAnimation
+            if (defenderDynamicAnimation.get() instanceof AttackAnimation
                     && defenderEntityState.getLevel() < 3
                     && blacklistClashBladeAnimation(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)
                     && defenderLivingEntityPatch.getHoldingItemCapability(InteractionHand.MAIN_HAND).getWeaponCategory() != WeaponCategories.FIST
@@ -162,10 +173,13 @@ public class MobClashBladeEvent {
                     && !damageSource.is(DamageTypes.EXPLOSION)
                     && !damageSource.is(DamageTypes.ON_FIRE)
                     && !damageSource.is(DamageTypes.IN_FIRE)
-                    && !damageSource.is(DamageTypes.FALL))
-                    || customAdditionClashBladeLogic(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
-                clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel);
+                    && !damageSource.is(DamageTypes.FALL)) {
+                clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel, 0);
+            } else if (customAdditionClashBladeLogic(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
+                clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel, 1);
             }
+        } else if (forceClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
+            clashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, serverLevel, 2);
         }
     }
 }
