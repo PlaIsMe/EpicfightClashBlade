@@ -68,6 +68,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("curse.maven:epic-fight-mod-405076:7345468")
+    implementation fg.deobf("curse.maven:epic-fight-skill-tree-1295882:7345465")
 }
 
 tasks.named('processResources', ProcessResources).configure {

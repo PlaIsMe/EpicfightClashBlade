@@ -15,6 +15,7 @@ public class EFClashBladeSkills {
     @SubscribeEvent
     public static void buildSkillEvent(SkillBuildEvent skillbuildevent) {
         SkillBuildEvent.ModRegistryWorker modRegistry = skillbuildevent.createRegistryWorker(EFClashBlade.MOD_ID);
-        EFClashBladeSkills.CLASH_BLADE = modRegistry.build("clash_blade", ClashBladeSkill::new, PassiveSkill.createPassiveBuilder());
+        EFClashBladeSkills.CLASH_BLADE = modRegistry.build("clash_blade", ClashBladeSkill::new, PassiveSkill.createPassiveBuilder()
+                .setCategory(EFClashBladeSkillCategories.CLASH_BLADE));
     }
 }

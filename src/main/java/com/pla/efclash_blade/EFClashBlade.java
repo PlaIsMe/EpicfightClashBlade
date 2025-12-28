@@ -1,16 +1,21 @@
 package com.pla.efclash_blade;
 import com.mojang.logging.LogUtils;
+import com.pla.efclash_blade.compat.EpicSkillsCompat;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
+import com.pla.efclash_blade.gameasset.EFClashBladeSkillCategories;
+import com.pla.efclash_blade.gameasset.EFClashBladeSkillSlots;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import yesman.epicfight.main.EpicFightSharedConstants;
 
 @Mod(EFClashBlade.MOD_ID)
 public class EFClashBlade
@@ -22,6 +27,11 @@ public class EFClashBlade
         IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
         context.registerConfig(ModConfig.Type.COMMON, EFClashBladeConfig.SPEC, "efclash_blade-server.toml");
+        EFClashBladeSkillSlots.ENUM_MANAGER.registerEnumCls("efclash_blade", EFClashBladeSkillSlots.class);
+        EFClashBladeSkillCategories.ENUM_MANAGER.registerEnumCls("efclash_blade", EFClashBladeSkillCategories.class);
+        if (EpicFightSharedConstants.isPhysicalClient() && ModList.get().isLoaded("epicskills")) {
+            EpicSkillsCompat.registerCategorySlotTexture();
+        }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

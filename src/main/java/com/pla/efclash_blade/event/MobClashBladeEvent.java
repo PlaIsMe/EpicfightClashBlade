@@ -1,6 +1,5 @@
 package com.pla.efclash_blade.event;
 
-import com.pla.efclash_blade.EFClashBlade;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +28,6 @@ import yesman.epicfight.world.capabilities.item.CapabilityItem.WeaponCategories;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 @EventBusSubscriber
 public class MobClashBladeEvent {
