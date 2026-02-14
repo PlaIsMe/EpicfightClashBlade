@@ -12,6 +12,7 @@ import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.AttackAnimation;
 import yesman.epicfight.api.animation.types.DynamicAnimation;
 import yesman.epicfight.api.animation.types.EntityState;
+import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.api.utils.AttackResult.ResultType;
 import yesman.epicfight.gameasset.EpicFightSounds;
@@ -35,7 +36,7 @@ public class ClashBladeSkill extends PassiveSkill {
         super(skillBuilder);
     }
 
-    private static boolean blacklistClashBladeAnimation(AssetAccessor<? extends DynamicAnimation> dynamicAnimation,
+    private static boolean blacklistClashBladeAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation,
                                                         EntityState entityState, ServerPlayer serverPlayer) {
         return true;
     }
@@ -51,7 +52,7 @@ public class ClashBladeSkill extends PassiveSkill {
 
             AnimationPlayer animationPlayer =
                     Objects.requireNonNull(playerPatch.getAnimator().getPlayerFor(null));
-            AssetAccessor<? extends DynamicAnimation> dynamicAnimation = animationPlayer.getAnimation();
+            AssetAccessor<? extends StaticAnimation> dynamicAnimation = animationPlayer.getRealAnimation();
 
             float elapsedTimeFloat = animationPlayer.getElapsedTime();
             EntityState entityState = dynamicAnimation.get().getState(playerPatch, elapsedTimeFloat);

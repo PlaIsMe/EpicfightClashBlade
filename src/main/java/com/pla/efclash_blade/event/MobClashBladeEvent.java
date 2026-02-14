@@ -18,6 +18,7 @@ import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.AttackAnimation;
 import yesman.epicfight.api.animation.types.DynamicAnimation;
 import yesman.epicfight.api.animation.types.EntityState;
+import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.gameasset.EpicFightSounds;
 import yesman.epicfight.particle.EpicFightParticles;
@@ -59,7 +60,7 @@ public class MobClashBladeEvent {
     // 1: special clash, clashing in front of mob without swinging attack animation, can clash against any type of damageSource
     // 2: force clash,clash without in front of mob, against any type of damage source
     private static void clashBlade(LivingAttackEvent livingAttackEvent, LivingEntityPatch<?> defenderLivingEntityPatch,
-                                   AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                   AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                    EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel, int clashBy) {
         customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, clashBy);
         livingAttackEvent.setCanceled(true);
@@ -91,40 +92,40 @@ public class MobClashBladeEvent {
 
     private static boolean customAdditionClashBladeLogic(LivingAttackEvent livingAttackEvent,
                                                          LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                          EntityState defenderEntityState, Entity attacker, Entity defender) {
         return false;
     }
 
     private static boolean forceClashBlade(LivingAttackEvent livingAttackEvent,
                                                          LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                          EntityState defenderEntityState, Entity attacker, Entity defender) {
         return false;
     }
 
     private static boolean blacklistClashBladeAnimation(LivingAttackEvent livingAttackEvent,
                                                          LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                         AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                         AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                          EntityState defenderEntityState, Entity attacker, Entity defender) {
         return true;
     }
 
     private static void customPreAdditionClashBlade(LivingAttackEvent livingAttackEvent,
                                                     LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                    AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                    AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                     EntityState defenderEntityState, Entity attacker, Entity defender, int clashBy) {
     }
 
     private static void customPostAdditionClashBlade(LivingAttackEvent livingAttackEvent,
                                                      LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                     AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                     AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                      EntityState defenderEntityState, Entity attacker, Entity defender, int clashBy) {
     }
 
     private static boolean conditionToPlayClashSound(LivingAttackEvent livingAttackEvent,
                                                      LivingEntityPatch<?> defenderLivingEntityPatch,
-                                                     AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation,
+                                                     AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                                      EntityState defenderEntityState, Entity attacker, Entity defender) {
         return true;
     }
@@ -153,7 +154,7 @@ public class MobClashBladeEvent {
             return;
         }
 
-        AssetAccessor<? extends DynamicAnimation> defenderDynamicAnimation = defenderAnimationPlayer.getAnimation();
+        AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation = defenderAnimationPlayer.getRealAnimation();
 
         float defenderElapsedTimeFloat = defenderAnimationPlayer.getElapsedTime();
         EntityState defenderEntityState = defenderDynamicAnimation.get().getState(defenderLivingEntityPatch, defenderElapsedTimeFloat);
