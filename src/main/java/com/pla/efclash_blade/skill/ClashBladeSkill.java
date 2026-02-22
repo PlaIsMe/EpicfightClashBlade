@@ -1,16 +1,17 @@
 package com.pla.efclash_blade.skill;
 
+import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.AttackAnimation;
-import yesman.epicfight.api.animation.types.DynamicAnimation;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
@@ -21,12 +22,12 @@ import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.skill.passive.PassiveSkill;
-import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem.WeaponCategories;
 import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
 
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 public class ClashBladeSkill extends PassiveSkill {
@@ -39,6 +40,14 @@ public class ClashBladeSkill extends PassiveSkill {
     private static boolean blacklistClashBladeAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation,
                                                         EntityState entityState, ServerPlayer serverPlayer) {
         return true;
+    }
+
+    private static int getWeaponDestroyValueOnClash(AssetAccessor<? extends StaticAnimation> dynamicAnimation, DamageSource damageSource) {
+        return EFClashBladeConfig.BREAK_WEAPON_VALUE_ON_CLASH.get();
+    }
+
+    private static void moreLogicAfterClashing(AssetAccessor<? extends StaticAnimation> dynamicAnimation, DamageSource damageSource, PlayerPatch<?> playerPatch, ServerLevel serverLevel) {
+        return;
     }
 
     @Override
@@ -78,6 +87,21 @@ public class ClashBladeSkill extends PassiveSkill {
                         serverPlayer.setDeltaMovement(new Vec3(serverPlayer.getLookAngle().x * -0.2D, 0.0D, serverPlayer.getLookAngle().z * -0.2D));
                         if (serverPlayer.level() instanceof ServerLevel serverLevel) {
                             EpicFightParticles.HIT_BLUNT.get().spawnParticleWithArgument(serverLevel, HitParticleType.FRONT_OF_EYES, HitParticleType.ZERO, serverPlayer, damageSource.getEntity());
+                            boolean damaged = false;
+                            if ((serverPlayer.getOffhandItem().getItem() instanceof SwordItem
+                                    || serverPlayer.getOffhandItem().getItem() instanceof AxeItem)
+                                    && new Random().nextBoolean()) {
+                                damaged = true;
+                                serverPlayer.getOffhandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource), serverPlayer, (player) -> {
+                                    player.broadcastBreakEvent(InteractionHand.OFF_HAND);
+                                });
+                            }
+                            if (!damaged) {
+                                serverPlayer.getMainHandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource), serverPlayer, (player) -> {
+                                    player.broadcastBreakEvent(InteractionHand.MAIN_HAND);
+                                });
+                            }
+                            moreLogicAfterClashing(dynamicAnimation, damageSource, playerPatch, serverLevel);
                         }
                     }
                 }
