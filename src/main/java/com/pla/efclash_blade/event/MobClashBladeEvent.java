@@ -3,6 +3,7 @@ package com.pla.efclash_blade.event;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -173,7 +174,7 @@ public class MobClashBladeEvent {
                     && blacklistClashBladeAnimation(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)
                     && defenderLivingEntityPatch.getHoldingItemCapability(InteractionHand.MAIN_HAND).getWeaponCategory() != WeaponCategories.FIST
                     && !damageSource.is(DamageTypes.MAGIC)
-                    && !damageSource.is(DamageTypes.EXPLOSION)
+                    && !damageSource.is(DamageTypeTags.IS_EXPLOSION)
                     && !damageSource.is(DamageTypes.ON_FIRE)
                     && !damageSource.is(DamageTypes.IN_FIRE)
                     && !damageSource.is(DamageTypes.FALL)) {

@@ -3,6 +3,7 @@ package com.pla.efclash_blade.skill;
 import com.pla.efclash_blade.config.EFClashBladeConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -42,7 +43,7 @@ public class ClashBladeSkill extends PassiveSkill {
         return true;
     }
 
-    private static int getWeaponDestroyValueOnClash(AssetAccessor<? extends StaticAnimation> dynamicAnimation, DamageSource damageSource) {
+    private static int getWeaponDestroyValueOnClash(AssetAccessor<? extends StaticAnimation> dynamicAnimation, DamageSource damageSource, PlayerPatch<?> playerPatch, ServerLevel serverLevel) {
         return EFClashBladeConfig.BREAK_WEAPON_VALUE_ON_CLASH.get();
     }
 
@@ -67,7 +68,7 @@ public class ClashBladeSkill extends PassiveSkill {
             EntityState entityState = dynamicAnimation.get().getState(playerPatch, elapsedTimeFloat);
 
             if ((playerPatch.getHoldingItemCapability(InteractionHand.MAIN_HAND).getWeaponCategory() != WeaponCategories.FIST)
-                    && !damageSource.is(DamageTypes.MAGIC) && !damageSource.is(DamageTypes.EXPLOSION)
+                    && !damageSource.is(DamageTypes.MAGIC) && !damageSource.is(DamageTypeTags.IS_EXPLOSION)
                     && !damageSource.is(DamageTypes.ON_FIRE) && !damageSource.is(DamageTypes.IN_FIRE)
                     && !damageSource.is(DamageTypes.FALL) && dynamicAnimation.get() instanceof AttackAnimation
                     && entityState.getLevel() < 3 && blacklistClashBladeAnimation(dynamicAnimation, entityState, serverPlayer)) {
@@ -92,12 +93,12 @@ public class ClashBladeSkill extends PassiveSkill {
                                     || serverPlayer.getOffhandItem().getItem() instanceof AxeItem)
                                     && new Random().nextBoolean()) {
                                 damaged = true;
-                                serverPlayer.getOffhandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource), serverPlayer, (player) -> {
+                                serverPlayer.getOffhandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource, playerPatch, serverLevel), serverPlayer, (player) -> {
                                     player.broadcastBreakEvent(InteractionHand.OFF_HAND);
                                 });
                             }
                             if (!damaged) {
-                                serverPlayer.getMainHandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource), serverPlayer, (player) -> {
+                                serverPlayer.getMainHandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource, playerPatch, serverLevel), serverPlayer, (player) -> {
                                     player.broadcastBreakEvent(InteractionHand.MAIN_HAND);
                                 });
                             }
