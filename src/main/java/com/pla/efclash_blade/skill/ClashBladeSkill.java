@@ -1,6 +1,7 @@
 package com.pla.efclash_blade.skill;
 
 import com.pla.efclash_blade.config.EFClashBladeConfig;
+import com.pla.efclash_blade.util.ScreenShakeUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -80,6 +81,7 @@ public class ClashBladeSkill extends PassiveSkill {
                     Vec3 entitySubtract = entityPosition.subtract(pre.getPlayerPatch().getOriginal().getEyePosition()).normalize();
 
                     if (entitySubtract.dot(entityViewVector) > 0.0D) {
+                        if (new Random().nextFloat() > EFClashBladeConfig.CLASH_CHANCE.get()) return;
                         pre.setCanceled(true);
                         pre.setResult(ResultType.BLOCKED);
                         playerPatch.playSound(EpicFightSounds.CLASH.get(), -0.05F, 0.1F);
@@ -101,6 +103,9 @@ public class ClashBladeSkill extends PassiveSkill {
                                 serverPlayer.getMainHandItem().hurtAndBreak(getWeaponDestroyValueOnClash(dynamicAnimation, damageSource, playerPatch, serverLevel), serverPlayer, (player) -> {
                                     player.broadcastBreakEvent(InteractionHand.MAIN_HAND);
                                 });
+                            }
+                            if (EFClashBladeConfig.SHAKE_SCREEN.get()) {
+                                ScreenShakeUtil.applyScreenShake(serverLevel, playerPatch.getOriginal().getOnPos().getCenter(), 1.0, 20, 4);
                             }
                             moreLogicAfterClashing(dynamicAnimation, damageSource, playerPatch, serverLevel);
                         }

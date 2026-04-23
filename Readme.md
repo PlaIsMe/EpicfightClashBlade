@@ -23,4 +23,4 @@
 </p>
 
 ## License & Use
-All Right Reserved
+GNU GENERAL PUBLIC LICENSE

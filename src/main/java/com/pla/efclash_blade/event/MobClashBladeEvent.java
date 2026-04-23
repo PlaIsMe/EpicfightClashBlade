@@ -1,6 +1,7 @@
 package com.pla.efclash_blade.event;
 
 import com.pla.efclash_blade.config.EFClashBladeConfig;
+import com.pla.efclash_blade.util.ScreenShakeUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
@@ -29,6 +30,7 @@ import yesman.epicfight.world.capabilities.item.CapabilityItem.WeaponCategories;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 @EventBusSubscriber
 public class MobClashBladeEvent {
@@ -62,6 +64,7 @@ public class MobClashBladeEvent {
     private static void clashBlade(LivingAttackEvent livingAttackEvent, LivingEntityPatch<?> defenderLivingEntityPatch,
                                    AssetAccessor<? extends StaticAnimation> defenderDynamicAnimation,
                                    EntityState defenderEntityState, Entity attackerEntity, Entity defenderEntity, ServerLevel serverLevel, int clashBy) {
+        if (new Random().nextFloat() > EFClashBladeConfig.CLASH_CHANCE.get()) return;
         customPreAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, clashBy);
         livingAttackEvent.setCanceled(true);
         if (conditionToPlayClashSound(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity)) {
@@ -87,6 +90,9 @@ public class MobClashBladeEvent {
                 defenderEntity,
                 attackerEntity
         );
+        if (EFClashBladeConfig.SHAKE_SCREEN.get() && attackerEntity instanceof Player player) {
+            ScreenShakeUtil.applyScreenShake(serverLevel, player.getOnPos().getCenter(), 1.0, 20, 4);
+        }
         customPostAdditionClashBlade(livingAttackEvent, defenderLivingEntityPatch, defenderDynamicAnimation, defenderEntityState, attackerEntity, defenderEntity, clashBy);
     }
 
